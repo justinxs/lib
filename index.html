@@ -8,9 +8,14 @@
 </head>
 <body>
 
-    <script src="./regExp.js"></script>
-    <script>
-        console.log(regLib)
+    <script type="module">
+        import * as lib from './index.mjs';
+        const special = new RegExp(lib.escapeRegExp('['), 'g')
+        console.log(special.test('asdasdasd[asdasd]asdasdasd1'))
+        console.log(lib.base64Encode('☸☹☺☻☼☾☿'))
+        console.log(lib.base64Decode(lib.base64Encode('☸☹☺☻☼☾☿')))
+        console.log(lib.base64AsBlob('data:text/plain;base64,SGVsbG8gV29ybGQh4pi44pi54pi64pi74pi84pi+4pi/'))
+        console.log(lib.base64AsBlob('data:text/plain;base64,SGVsbG8gV29ybGQh4pi44pi54pi64pi74pi84pi+4pi/').text())
     </script>
 </body>
 </html>
