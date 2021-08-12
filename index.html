@@ -14,8 +14,15 @@
         console.log(special.test('asdasdasd[asdasd]asdasdasd1'))
         console.log(lib.base64Encode('☸☹☺☻☼☾☿'))
         console.log(lib.base64Decode(lib.base64Encode('☸☹☺☻☼☾☿')))
+        console.log(lib.base64Decode('SGVsbG8gV29ybGQh4pi44pi54pi64pi74pi84pi+4pi/'))
         console.log(lib.base64AsBlob('data:text/plain;base64,SGVsbG8gV29ybGQh4pi44pi54pi64pi74pi84pi+4pi/'))
         console.log(lib.base64AsBlob('data:text/plain;base64,SGVsbG8gV29ybGQh4pi44pi54pi64pi74pi84pi+4pi/').text())
+        
+        const imgBlob = lib.base64AsBlob('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAWCAYAAADafVyIAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QkVCMDNGRDlGQkIyMTFFQTlFNzU5NUM5N0QwNjEwMTUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QkVCMDNGREFGQkIyMTFFQTlFNzU5NUM5N0QwNjEwMTUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpCRUIwM0ZEN0ZCQjIxMUVBOUU3NTk1Qzk3RDA2MTAxNSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpCRUIwM0ZEOEZCQjIxMUVBOUU3NTk1Qzk3RDA2MTAxNSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PiLGAz0AAAG7SURBVHjarNVPKARRHMDx2W1TSkrJnwMuG0qJg4ts7U1yJSdSNhcHa5MkLiSFg1zlX26bXPdE2D2gVevosKkVliJJuNj1ffUbjdlZdtb+6tNsb2be2/d+v3nP0R1KdWmato5q7X9xhyGEjI3OAnWuIoIzc6OrQJ3H0Y9i+FGEbdy7tMLEhFyP0Cy/R9DkND3ogSMHHsM7h9hDOZ4M7bXwOvP8x2m5pjCGSuxLPnuRkPvX5iUK2xxoAzGsoQE7OMEgKnDhoEzTec7iRTpVRRKVitTjA3V4+E+SF1SVIGjqXMWq6lyzuOHJMbFXWEGPqV1FEvPGD81uYo1luWzx3LQs3/eHZjfJx9jFjJSiMVQuNs1bhZ1QZRlAFSYtZhiQZ/IeQH3+56jBsGxwegStViCXJOtJfMUU3DiFD32S0EfJS+lfA/yW3JhUSKMM7MUBymT/SVgsW8YAYenQKCL33HL9NO3GnXiWZfPnMwM9VGJLcGtI+BY68IZZ2a4zzgM7oWZxiTlJeFzaWzBg9YLdKqrHO5ZkH1qUUyyarS+XlFqup9ooxtGaZfZJqxn4rG5kiXa0Zen8Rg79H/ElwABvXl/4yfiCuwAAAABJRU5ErkJggg==')
+        const img = new Image()
+        img.src = URL.createObjectURL(imgBlob)
+        document.body.appendChild(img)
+        console.log(imgBlob)
     </script>
 </body>
 </html>

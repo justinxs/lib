@@ -14,8 +14,7 @@ const REGEXP_MAP = {
  * @returns {String} 数据类型：nan/object/arraybuffer...
  */
 export function getDataType(data, isLower = true) {
-    let matches = null
-    let type = Object.prototype.toString.call(data)
+    let matches, type = Object.prototype.toString.call(data)
     if (matches = REGEXP_MAP.type.exec(type)) {
         type = matches[1] === 'Number' && isNaN(data) ? 'NaN' : matches[1]
     }
@@ -31,7 +30,7 @@ export function getDataType(data, isLower = true) {
  * @param {String} str 字符串
  * @returns {Uint8Array} 
  */
-function strToUnit8(str) {
+function strToUint8(str) {
     let aBytes, nChr, strLen = str.length, bytesLen = 0;
     for (let nMapIdx = 0; nMapIdx < strLen; nMapIdx++) {
         nChr = str.charCodeAt(nMapIdx);
@@ -83,20 +82,17 @@ function strToUnit8(str) {
 
 
 function uint6ToB64(uint6) {
-    let b64 = 65
     if (uint6 < 26) {
-        b64 = uint6 + 65
+        return uint6 + 65
     } else if (uint6 < 52) {
-        b64 = uint6 + 71
+        return uint6 + 71
     } else if (uint6 < 62) {
-        b64 = uint6 - 4
+        return uint6 - 4
     } else if (uint6 === 62) {
-        b64 = 43
+        return 43
     } else if (uint6 === 63) {
-        b64 = 47
+        return 47
     }
-
-    return b64
 }
 
 /**
@@ -105,8 +101,7 @@ function uint6ToB64(uint6) {
  * @returns {String} base64编码内容
  */
 export function base64Encode(str) {
-    let aBytes = strToUnit8(str)
-    let eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = ""
+    let aBytes = strToUint8(str), eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = ""
 
     for (let nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
         nMod3 = nIdx % 3
@@ -129,24 +124,21 @@ export function base64Encode(str) {
 
 
 function b64ToUint6(b64) {
-    let unit6 = 0
     if (b64 > 64 && b64 < 91) {
-        unit6 = b64 - 65
+        return b64 - 65
     } else if (b64 > 96 && b64 < 123) {
-        unit6 = b64 - 71
+        return b64 - 71
     } else if (b64 > 47 && b64 < 58) {
-        unit6 = b64 + 4
+        return b64 + 4
     } else if (b64 === 43) {
-        unit6 = 62
+        return 62
     } else if (b64 === 47) {
-        unit6 = 63
+        return 63
     }
-
-    return unit6
 }
 
 
-function base64ToUnit8(base64Content, nBlockSize) {
+function base64ToUint8(base64Content, nBlockSize) {
     let sB64Enc = base64Content.replace(/[^A-Za-z0-9\+\/]/g, ""), 
         nInLen = sB64Enc.length,
         nOutLen = nBlockSize ? Math.ceil((nInLen * 3 + 1 >>> 2) / nBlockSize) * nBlockSize : nInLen * 3 + 1 >>> 2, 
@@ -172,7 +164,7 @@ function base64ToUnit8(base64Content, nBlockSize) {
  * @returns {String} 解码后的字符串
  */
 export function base64Decode(base64Content) {
-    let sView = "", aBytes = base64ToUnit8(base64Content);
+    let sView = "", aBytes = base64ToUint8(base64Content);
 
     for (let nPart, nCode, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
         nPart = aBytes[nIdx];
@@ -208,12 +200,12 @@ export function base64Decode(base64Content) {
 /**
  * 分解base64数据 
  * data:[<mediatype>][;base64],<data>  https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
- * 每 4 个base64字符 = 3 byte           https://developer.mozilla.org/zh-CN/docs/Glossary/Base64
+ * 每 4 个base64字符(4 * 6 = 24) = 3 byte(3 * 8 = 24)           https://developer.mozilla.org/zh-CN/docs/Glossary/Base64
  * @param {DOMString} dataURI base64数据字符串
- * @param {Boolean} isUnit8 是否需要转化Uint8Array类型数组，为 true 时 size 取unit8.byteLength更加准确
- * @returns {Object} [mimeType]数据MIME类型，[size]数据大小，[content]数据内容, [unit8]内容转Uint8Array
+ * @param {Boolean} isUint8 是否需要转化Uint8Array类型数组，为 true 时 size 取uint8.byteLength更加准确
+ * @returns {Object} [mimeType]数据MIME类型，[size]数据大小，[content]数据内容, [uint8]内容转Uint8Array
  */
-export function formatBase64(dataURI, isUnit8) {
+export function formatBase64(dataURI, isUint8) {
     let matches = REGEXP_MAP.base64.exec(dataURI)
     if (!matches) {
         console.error('dataURI is not define or dataURI is not DataURI')
@@ -227,9 +219,9 @@ export function formatBase64(dataURI, isUnit8) {
             content
         }
     
-    if (isUnit8) {
-        result.unit8 = base64ToUnit8(content)
-        result.size = result.unit8.byteLength
+    if (isUint8) {
+        result.uint8 = base64ToUint8(content)
+        result.size = result.uint8.byteLength
     }
 
     return result
@@ -248,9 +240,9 @@ export function formatBase64(dataURI, isUnit8) {
  * @return {Object} 成功返回Blob 文件对象 
  */
 export function base64AsBlob(dataURI, mimeType) {
-    let base64 = formatBase64(dataURI), type = mimeType || base64.mimeType;
+    let base64 = formatBase64(dataURI, true);
 
-    return new Blob([base64.unit8], { type })
+    return new Blob([base64.uint8], { type: mimeType || base64.mimeType })
 }
 
 
