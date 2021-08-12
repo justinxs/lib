@@ -1,3 +1,9 @@
+/**
+ * type:       [object Object]
+ * ie:         Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; InfoPath.3; rv:11.0) like Gecko
+ *             Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; InfoPath.3)
+ * base64:     data:[<mediatype>][;base64],<data> 
+ */
 const REGEXP_MAP = {
     type: /^\[object (\S+)\]$/,
     ie: /(?:ms|\()(ie)\s([\w\.]+)|trident|(edge|edgios|edga|edg)/i,
@@ -137,11 +143,15 @@ function b64ToUint6(b64) {
     }
 }
 
-
+/**
+ * https://juejin.cn/post/6844904197519835150
+ * Base64 的内容是有 0-9，a-z，A-Z，+，/ 组成，正好 64 个字符，等号 = 用来作为后缀用途
+ * MAP A-Z[0-25/0b000000-0b011001] a-z[27-51/0b011010-0b110011] 0-9[52-61/0b110100-0b111101] +[62/0b111110] /[63/0b111111]
+ * 
+ */
 function base64ToUint8(base64Content, nBlockSize) {
-    let sB64Enc = base64Content.replace(/[^A-Za-z0-9\+\/]/g, ""), 
+    let {noPaddingContent: sB64Enc, size: nOutLen} = getBase64Size(base64Content, nBlockSize),
         nInLen = sB64Enc.length,
-        nOutLen = nBlockSize ? Math.ceil((nInLen * 3 + 1 >>> 2) / nBlockSize) * nBlockSize : nInLen * 3 + 1 >>> 2, 
         aBytes = new Uint8Array(nOutLen);
 
     for (let nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {
@@ -202,29 +212,50 @@ export function base64Decode(base64Content) {
  * data:[<mediatype>][;base64],<data>  https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
  * 每 4 个base64字符(4 * 6 = 24) = 3 byte(3 * 8 = 24)           https://developer.mozilla.org/zh-CN/docs/Glossary/Base64
  * @param {DOMString} dataURI base64数据字符串
- * @param {Boolean} isUint8 是否需要转化Uint8Array类型数组，为 true 时 size 取uint8.byteLength更加准确
- * @returns {Object} [mimeType]数据MIME类型，[size]数据大小，[content]数据内容, [uint8]内容转Uint8Array
+ * @param {Number} blockSize 
+ * @returns {Object} [mimeType]数据MIME类型，[size]数据大小，[content]数据内容
  */
-export function formatBase64(dataURI, isUint8) {
+export function formatBase64(dataURI, blockSize) {
     let matches = REGEXP_MAP.base64.exec(dataURI)
     if (!matches) {
         console.error('dataURI is not define or dataURI is not DataURI')
         return
     }
-    let mediatype = matches[1], 
-        content = matches[2], 
-        result = {
-            mimeType: mediatype || 'text/plain;charset=UTF-8',
-            size: content.length / 4 * 3 | 0,
-            content
-        }
-    
-    if (isUint8) {
-        result.uint8 = base64ToUint8(content)
-        result.size = result.uint8.byteLength
+    let {noPaddingContent, size} = getBase64Size(matches[2], blockSize)
+    return {
+        mimeType: matches[1] || 'text/plain;charset=UTF-8',
+        content: matches[2],
+        noPaddingContent,
+        size
     }
+}
 
-    return result
+/**
+ * nopaddingLen 应该等于 2/3/4/6/7/8，不会为 1。 +1 是为了处理异常nopaddingLen=1的情况
+ * Math.floor((nopaddingLen * 6 + 2) / 8) => Math.floor((nopaddingLen * 3 + 1) / Math.pow(2, 2)) => nopaddingLen * 3 + 1 >>> 2
+ * 
+ * nopaddingLen = 4n - eqLen(= 0/1/2) =>  n = (nopaddingLen + eqLen) / 4  每 4 个base64字符等于 3 个字节
+ * 
+ * size  =  n * 3 - Math.ceil(eqLen * 6 / 8) (bytes/字节) = (n * 3 - Math.ceil(eqLen * 6 / 8)) * 8 (bits/比特/位)
+ * 
+ * => size = (nopaddingLen + eqLen) / 4 * 3 - Math.ceil(eqLen * 3 / 4)  =  (nopaddingLen * 3 + eqLen * 3) / 4 - Math.ceil(eqLen * 3 / 4)
+ * 
+ * => (nopaddingLen * 3 + (eqLen * 3 - Math.ceil(eqLen * 3 / 4) * 4)) / 4
+ * 
+ *  Math.ceil(eqLen * 3 / 4) ≈ eqLen
+ * 
+ * => (nopaddingLen * 3 + (eqLen * 3 - eqLen * 4)) / 4 = (nopaddingLen * 3 - eqLen) / 4 = (nopaddingLen * 3 - [0/1/2]) / 4 
+ * 
+ * = nopaddingLen * 3 / 4 - (0/0.25/0.5)  ≈  Math.floor(nopaddingLen * 3 / 4)
+ */
+function getBase64Size(base64Content, blockSize) {
+    let noPaddingContent = base64Content.replace(/[^A-Za-z0-9\+\/]/g, ""),
+        nopaddingLen = noPaddingContent.length;
+    
+    return {
+        noPaddingContent,
+        size: blockSize ? Math.ceil((nopaddingLen * 3 + 1 >>> 2) / blockSize) * blockSize : nopaddingLen * 3 + 1 >>> 2
+    }
 }
 
 
@@ -240,9 +271,9 @@ export function formatBase64(dataURI, isUint8) {
  * @return {Object} 成功返回Blob 文件对象 
  */
 export function base64AsBlob(dataURI, mimeType) {
-    let base64 = formatBase64(dataURI, true);
+    let base64 = formatBase64(dataURI), buffer = base64ToUint8(base64.content);
 
-    return new Blob([base64.uint8], { type: mimeType || base64.mimeType })
+    return new Blob([buffer], { type: mimeType || base64.mimeType })
 }
 
 
