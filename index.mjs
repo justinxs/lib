@@ -38,6 +38,42 @@ export function escapeRegExp(string) {
 }
 
 
+function toBinary(target, category = 10) {
+    let bInt = '', bFloat = '', targetInt, targetFloat
+    if (category === 'Binary' || category === 2) {
+        return target
+    } else if (!(category === 'Decimal' || category === 10)) {
+        target = toDecimal(target, category)
+    } 
+
+    [targetInt, targetFloat] = String(target).split('.')
+    while (targetInt > 0) {
+        bInt += targetInt % 2
+        targetInt = targetInt / 2 | 0
+    }
+
+    while (targetFloat > 0 && targetFloat < 1) {
+        bFloat += targetFloat * 2 | 0
+        targetFloat = targetFloat * 2
+    }
+
+    return bFloat ? bVal.split('').reverse().join('') + '.' + bFloat : bVal.split('').reverse().join('')
+}
+
+
+function toDecimal(target, category = 2) {
+    
+}
+
+
+function toOctal() {
+    
+}
+
+function toHexadecimal() {
+    
+}
+
 
 
 export { base64AsBlob, formatBase64, base64Encode, base64Decode } from './base64.mjs'
