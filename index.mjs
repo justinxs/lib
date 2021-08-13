@@ -1,6 +1,3 @@
-export { base64AsBlob, formatBase64, base64Encode, base64Decode } from './base64.mjs'
-
-
 /**
  * type:       [object Object]
  * ie:         Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; InfoPath.3; rv:11.0) like Gecko
@@ -41,3 +38,6 @@ export function escapeRegExp(string) {
 }
 
 
+
+
+export { base64AsBlob, formatBase64, base64Encode, base64Decode } from './base64.mjs'
