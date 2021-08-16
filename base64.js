@@ -1,3 +1,5 @@
+import { getDataType } from "./common.js"
+
 /**
  * Base64:     data:[<mediatype>][;base64],<data> 
  * 
@@ -251,4 +253,34 @@ export function base64AsBlob(dataURI, mimeType) {
     return new Blob([buffer], { type: mimeType || base64.mimeType })
 }
 
+
+/**
+ * 文件转blob数据格式
+ *  @param {*} file 文件数据
+ *  @param {String} mimeType 文件MIME类型
+ * 
+ */
+export function toBlob(file, mimeType) {
+    let dataType = getDataType(file);
+    let blobData = null;
+    switch (dataType) {
+        case 'file':
+        case 'blob':
+            blobData = file;
+            break;
+        case 'uint8array':
+        case 'uint16array':
+        case 'uint32array':
+        case 'arraybuffer':
+            blobData = new Blob([file], {type: mimeType});
+            break;
+        case 'string':
+            blobData = base64Reg.test(file) ? base64AsBlob(file) : null;
+            break;
+        default:
+            break;
+    }
+    
+    return blobData
+}
 
