@@ -9,7 +9,7 @@
 <body>
 
     <script type="module">
-        import {common, base64} from './index.js';
+        import {common, base64, xhr} from './index.js';
         const special = new RegExp(common.escapeRegExp('['), 'g')
         console.log(special.test('asdasdasd[asdasd]asdasdasd1'))
         console.log(base64.base64Encode('☸☹☺☻☼☾☿'))
@@ -25,6 +25,27 @@
         img.src = URL.createObjectURL(imgBlob)
         document.body.appendChild(img)
         console.log(imgBlob)
+
+        const pic = new Image()
+        pic.crossOrigin = 'anonymous'
+        pic.onload = function (e) {
+            const canvas = document.createElement('canvas')
+            canvas.width = pic.naturalWidth
+            canvas.height = pic.naturalHeight
+            const ctx = canvas.getContext('2d')
+            ctx.drawImage(pic, 0, 0, pic.naturalWidth, pic.naturalHeight)
+            document.body.appendChild(canvas)
+            canvas.toBlob(function(file) {
+                console.log(file)
+            }, 'image/jpeg', 1)
+        }
+        // pic.src = 'https://10wallpaper.com/wallpaper/1366x768/1603/Batman_v_Superman_2016-Movie_High_Quality_Wallpaper_1366x768.jpg'
+        // pic.src = 'https://gd1.alicdn.com/imgextra/i3/0/TB16l8ZMXXXXXXIXXXXXXXXXXXX_!!0-item_pic.jpg'
+        xhr.downloadFile({
+            file: 'https://gd1.alicdn.com/imgextra/i3/0/TB16l8ZMXXXXXXIXXXXXXXXXXXX_!!0-item_pic.jpg', 
+            fileName: 'superman.jpg', 
+            isRemote: true
+        })
     </script>
 </body>
 </html>
