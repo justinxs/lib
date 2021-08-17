@@ -1,5 +1,30 @@
 import { toBlob } from "./base64.js"
 
+
+/**
+ * 兼容创建XMLHttpRquest对象
+ * @method createXhr
+ * @return {Object} xhr
+ */
+
+export function createXhr() {
+    let xhr;
+    try {
+        xhr = new XMLHttpRequest()
+    } catch (e) {
+        try {
+            xhr = ActiveXobject('Msxml12.XMLHTTP')
+        } catch (ex) {
+            try {
+                xhr = ActiveXobject('Microsoft.XMLHTTP')
+            } catch (failed) {
+                xhr = false
+            }
+        }
+    }
+
+    return xhr
+}
 /**
  * 远程资源本地化
  * @method getStaticFile
@@ -22,7 +47,7 @@ import { toBlob } from "./base64.js"
 
 export function getStaticFile(url, type = '') {
     return new Promise((resolve, reject) => {
-        let xhr = new XMLHttpRequest();
+        let xhr = createXhr();
         xhr.onload = function () {
             if (xhr.readyState === xhr.DONE) {
                 if (xhr.status === 200) {
