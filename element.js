@@ -145,8 +145,27 @@ export class MemoriesEditor extends Events {
         }
     }
     changeSelection(e) {
-        let selection = window.getSelection()
-        this.lastEditRange = selection.getRangeAt(0);
+        this.lastEditRange = this.getSelection().getRangeAt(0);
+    }
+    getSelection(range) {
+        let selection = window.getSelection();
+        if (range) {
+            this.setSelectionRange(selection, {range})
+        }
+        return selection
+    }
+    setSelectionRange(selection, rangeParams) {
+        let {range, rangeNode, rangeStart} = rangeParams
+        if (!range) {
+            range = document.createRange()
+            range.selectNodeContents(rangeNode)
+            range.setStart(rangeNode, rangeStart)
+            range.collapse(true)
+        }
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        return selection.getRangeAt(0)
     }
     insert(content) {
         if (!content) return;
@@ -182,19 +201,23 @@ export class MemoriesEditor extends Events {
         const editor = this.editor
 
         editor.focus();
-        let selection = window.getSelection();
-        if (this.lastEditRange) {
-            selection.removeAllRanges();
-            selection.addRange(this.lastEditRange);
-        }
-        let anchorNode = selection.anchorNode
-        let anchorOffset = selection.anchorOffset
-        let childs = [...anchorNode.childNodes];
-        let childLen = childs.length;
-        let range = null;
-        let rangeContent = null
-        let rangeStart = 0
-
+        let selection = this.getSelection(this.lastEditRange),
+            anchorNode = selection.anchorNode,
+            anchorOffset = selection.anchorOffset,
+            childs = [...anchorNode.childNodes],
+            childLen = childs.length,
+            rangeNode = null,
+            rangeStart = 0;
+        // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+        // Node.ELEMENT_NODE	1	An Element node like <p> or <div>.
+        // Node.ATTRIBUTE_NODE	2	An Attribute of an Element.
+        // Node.TEXT_NODE	3	The actual Text inside an Element or Attr.
+        // Node.CDATA_SECTION_NODE	4	A CDATASection, such as <!CDATA[[ … ]]>.
+        // Node.PROCESSING_INSTRUCTION_NODE	7	A ProcessingInstruction of an XML document, such as <?xml-stylesheet … ?>.
+        // Node.COMMENT_NODE	8	A Comment node, such as <!-- … -->.
+        // Node.DOCUMENT_NODE	9	A Document node.
+        // Node.DOCUMENT_TYPE_NODE	10	A DocumentType node, such as <!DOCTYPE html>.
+        // Node.DOCUMENT_FRAGMENT_NODE	11	A DocumentFragment node.
         if (anchorNode.nodeType != Node.TEXT_NODE) {
             if (childLen == 1 && childs[0].nodeType == Node.COMMENT_NODE) {
                 anchorNode.insertBefore(el, childs[0].nextSibling)
@@ -213,26 +236,20 @@ export class MemoriesEditor extends Events {
                 anchorNode.appendChild(el)
             }
             
-            rangeContent = el.parentNode
+            rangeNode = el.parentNode
             rangeStart = anchorOffset + 1
         } else {
-            rangeContent = anchorNode.splitText(anchorOffset);
-            anchorNode.parentNode.insertBefore(el, rangeContent);
+            rangeNode = anchorNode.splitText(anchorOffset);
+            anchorNode.parentNode.insertBefore(el, rangeNode);
             // 末尾插入多一个换行标签实现换行
-            if (!rangeContent.nodeValue && el.nodeName === 'BR') {
-                anchorNode.parentNode.insertBefore(document.createElement('br'), rangeContent);
+            if (!rangeNode.nodeValue && el.nodeName === 'BR') {
+                anchorNode.parentNode.insertBefore(document.createElement('br'), rangeNode);
             }
 
             rangeStart = 0
         }
 
-        range = document.createRange()
-        range.selectNodeContents(rangeContent)
-        range.setStart(rangeContent, rangeStart)
-        range.collapse(true)
-        selection.removeAllRanges()
-        selection.addRange(range)
-        this.lastEditRange = selection.getRangeAt(0);
+        this.lastEditRange = this.setSelectionRange(selection, {rangeNode, rangeStart});
     }
     setRangeEnd() {
         const editor = this.editor
@@ -240,13 +257,10 @@ export class MemoriesEditor extends Events {
             editor.selectionStart = editor.selectionEnd = this.content.length;
         } else {
             let selection = window.getSelection();
-            let range = document.createRange();
-            range.selectNodeContents(editor);
-            range.setStart(editor, editor.childNodes.length);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            this.lastEditRange = selection.getRangeAt(0);
+            this.lastEditRange = this.setSelectionRange(selection, {
+                rangeNode: editor, 
+                rangeStart: editor.childNodes.length
+            });
         }
     }
     destroy() {
