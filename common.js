@@ -4,8 +4,8 @@
  *             Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; InfoPath.3)
  */
 
-const REGEXP_TYPE = /^\[object (\S+)\]$/
-const REGEXP_IE = /(?:ms|\()(ie)\s([\w\.]+)|trident|(edge|edgios|edga|edg)/i
+const TYPE_REGEXP = /^\[object (\S+)\]$/
+const IE_REGEXP = /(?:ms|\()(ie)\s([\w\.]+)|trident|(edge|edgios|edga|edg)/i
 
 
 
@@ -17,7 +17,7 @@ const REGEXP_IE = /(?:ms|\()(ie)\s([\w\.]+)|trident|(edge|edgios|edga|edg)/i
  */
 export function getDataType(data, isLower = true) {
     let matches, type = Object.prototype.toString.call(data)
-    if (matches = REGEXP_TYPE.exec(type)) {
+    if (matches = TYPE_REGEXP.exec(type)) {
         type = matches[1] === 'Number' && isNaN(data) ? 'NaN' : matches[1]
     }
 

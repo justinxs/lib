@@ -84,15 +84,18 @@
         </div>
     </div>
     <script type="module">
-        import * as EL from './element.js'
+        import * as Editor from './editor.js'
         const emojiJson = ['😀','😃','😄','😁','😆','😅']
         const emojiHtml = emojiJson.reduce((str, code) => str += `<li class="emoji-item">${code}</li>`, '');
         const emojiList = [...document.querySelectorAll('.emoji-list')];
         
-        const memoriesEditor = new EL.MemoriesEditor({editor: '#content-editor'})
-        const memoriesTextarea = new EL.MemoriesEditor({editor: '#textarea-editor'})
+        const memoriesEditor = new Editor.MemoriesEditor({editor: '#content-editor'})
+        const memoriesTextarea = new Editor.MemoriesEditor({editor: '#textarea-editor'})
         memoriesEditor.on('contentChange', ({content, action}) => {
             console.log(content, action)
+        })
+        memoriesEditor.on('enter', (editor) => {
+            console.log(editor.content)
         })
         emojiList.forEach((el, i) => {
             el.innerHTML = emojiHtml

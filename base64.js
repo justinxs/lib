@@ -5,7 +5,7 @@ import { getDataType } from "./common.js"
  * 
  */
 
-const REGEXP_BASE64 = /^data:([\S]+);base64,(.+)/
+const BASE64_REGEXP = /^data:([\S]+);base64,(.+)/
 
 
 /**
@@ -193,7 +193,7 @@ export function base64Decode(base64Content) {
  * @returns {Object} [mimeType]数据MIME类型，[size]数据大小，[content]数据内容
  */
 export function formatBase64(dataURI, blockSize) {
-    let matches = REGEXP_BASE64.exec(dataURI)
+    let matches = BASE64_REGEXP.exec(dataURI)
     if (!matches) {
         console.error('dataURI is not define or dataURI is not DataURI')
         return
