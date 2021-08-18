@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>光标位置</title>
+    <title>editor</title>
     <style>
         * {
             padding: 0;
@@ -29,9 +29,6 @@
         }
         .emoji-container {
             position: relative;
-        }
-        .emoji-container:hover .emoji-list {
-            display: flex;
         }
         .emoji-list {
             position: absolute;
@@ -71,7 +68,7 @@
     <div class="editor-container">
         <div id="content-editor"></div>
         <div class="emoji-container">
-            <span class="emoji-text">表情</span>
+            <span class="emoji-text">emoji</span>
             <ul class="emoji-list"></ul>
         </div>
     </div>
@@ -79,7 +76,7 @@
     <div class="editor-container">
         <textarea id="textarea-editor"></textarea>
         <div class="emoji-container">
-            <span class="emoji-text">表情</span>
+            <span class="emoji-text">emoji</span>
             <ul class="emoji-list"></ul>
         </div>
     </div>
@@ -103,6 +100,17 @@
                 const target = e.target;
                 target.className === 'emoji-item' && (i == 0 ? memoriesEditor : memoriesTextarea).insert(target.innerText)
             }, false)
+        })
+
+        const buttons = document.querySelectorAll('.emoji-text')
+        buttons.forEach(b => {
+            b.addEventListener('click', e => {
+                if (b.nextElementSibling.style.display === 'flex') {
+                    b.nextElementSibling.style.display = 'none'
+                } else {
+                    b.nextElementSibling.style.display = 'flex'
+                }
+            })
         })
     </script>
 </body>
