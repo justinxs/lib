@@ -91,7 +91,9 @@
         
         const memoriesEditor = new EL.MemoriesEditor({editor: '#content-editor'})
         const memoriesTextarea = new EL.MemoriesEditor({editor: '#textarea-editor'})
-
+        memoriesEditor.on('contentChange', ({content, action}) => {
+            console.log(content, action)
+        })
         emojiList.forEach((el, i) => {
             el.innerHTML = emojiHtml
             el.addEventListener('click', function(e) {

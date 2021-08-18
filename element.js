@@ -1,4 +1,5 @@
 import {getDataType} from './common.js'
+import Events from './events.js'
 
 export function isDom(dom) {
     return dom instanceof HTMLElement
@@ -69,8 +70,9 @@ export function getQueryString(name, mode = 'history') {
  * 光标记忆输入框
  *  
  */
-export class MemoriesEditor {
+export class MemoriesEditor extends Events {
     constructor(params) {
+        super()
         let {editor} = params
         this.editor = editor
         this.init()
@@ -102,8 +104,8 @@ export class MemoriesEditor {
         let selection = window.getSelection()
         this.lastEditRange = selection.getRangeAt(0);
     }
-    contentChange(editor, action = 'input') {
-        console.log(this.content, action)
+    contentChange(action = 'input') {
+        this.emit('contentChange', {content: this.content, action})
     }
     setContent(content) {
         if (this.category === 'textarea') {
@@ -112,10 +114,11 @@ export class MemoriesEditor {
             this.editor.innerHTML = content
         }
         this.setRangeEnd()
+        this.contentChange('set')
     }
     addEvent() {
         const changeSelection = this.changeSelection.bind(this)
-        const contentChange = this.contentChange.bind(this)
+        const contentChange = (target, action) => this.contentChange(action)
         const category = this.category
         const editor = this.editor
         const inputEvent = compositeInput(editor, contentChange)
@@ -146,8 +149,10 @@ export class MemoriesEditor {
         this.lastEditRange = selection.getRangeAt(0);
     }
     insert(content) {
+        if (!content) return;
+
         this.category === 'textarea' ? this.insertTextarea(content) : this.insertEditor(content)
-        this.contentChange(this.editor, 'insert')
+        this.contentChange('insert')
     }
     insertTextarea(content) {
         const editor = this.editor
