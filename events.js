@@ -51,8 +51,8 @@ class Events {
         }
     }
     emit(eventName, data, callbackId = '') {
-        const callbackGroup = this.eventMap[eventName];
-        if (callbackGroup) {
+        let callbackGroup = this.eventMap[eventName];
+        if (callbackGroup && (callbackGroup = callbackGroup.slice(0))) {
             for (let i = 0; i < callbackGroup.length; i++) {
                 const item = callbackGroup[i];
                 if (!callbackId) {
