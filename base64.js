@@ -8,6 +8,10 @@ import { getDataType } from "./common.js"
 const BASE64_REGEXP = /^data:([\S]+);base64,(.+)/
 
 
+export function testBase64(str) {
+    return BASE64_REGEXP.test(str)
+}
+
 /**
  * 字符串转 Uint8Array 类型数组
  * @param {String} str 字符串
@@ -284,3 +288,28 @@ export function toBlob(file, mimeType) {
     return blobData
 }
 
+
+/**
+ * 文件转base64格式
+ * @method fileAsBase64
+ * @param {Object} file 文件 [object File] [object Blob]
+ * @return {Promise} 返回一个promise对象，成功得到一个对象 {code: 1, data}
+ */
+export function fileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function (e) {
+            resolve({
+                name: file.name,
+                type: file.type,
+                originSize: file.size,
+                base64: e.target.result
+            })
+        }
+        reader.onerror = function (e) {
+            console.error('[FileReader:error]' + e)
+            reject(e)
+        }
+    })
+}

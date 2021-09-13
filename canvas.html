@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>canvas</title>
+</head>
+<body>
+    <input id="file" type="file" name="" id="">
+    <script type="module">
+        import { imgZip } from './canvas.js';
+        document.querySelector('#file').addEventListener('change', e => {
+            console.log(e.target.files[0])
+            imgZip(e.target.files[0], {type: 'image/png', q: 0.8}).then(data => {
+                console.log(data)
+            })
+            e.target.value = null
+        })
+    </script>
+</body>
+</html>

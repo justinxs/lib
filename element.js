@@ -79,3 +79,31 @@ export function iOSTouch(isPreventDouble = false) {
     }
 }
 
+
+/**
+ * 异步加载图片
+ * @method loadImg
+ * @param {String} url 图片地址
+ * @param {Boolean} crossOrigin 是否设置跨域
+ * @return {Promise} 成功返回一个加载完的img DOM
+ */
+
+export function loadImg(url, crossOrigin = false) {
+    return new Promise((resolve, reject) => {
+        let img = new Image();
+        crossOrigin && (img.crossOrigin = 'anonymous');
+        img.onload = function (e) {
+            resolve(img)
+        }
+        img.onabort = function (e) {
+            console.warn('[Image:abort] ' + e)
+            reject(e)
+        }
+        img.onerror = function (e) {
+            console.error('[Image:error] ' + e)
+            reject(e)
+        }
+
+        img.src = url
+    })
+}
