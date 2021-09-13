@@ -134,7 +134,7 @@ export function floatOperate(action, ...data) {
                 break;
         }
     }
-    
+
     return data.length > 1 ? data.reduce((re, num) => handler(action, re, num)) : data[0]
 };
 
@@ -343,4 +343,16 @@ export function stringify(data) {
     return result
 }
 
+/**
+ * 乱序 
+ * @param {Array} A 原数组,修改原数组
+ */
+export function shuffle(A) {
+    for (let i = A.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [A[i], A[j]] = [A[j], A[i]]
+    }
+    
+    return A
+}
 

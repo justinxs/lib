@@ -6,7 +6,7 @@ class LazyModule extends Events {
         super()
         this.sourceMap = {
             'QRCode': {type: 'js', path: 'lib/qrcode.min.js'},
-            'swipercss': {type: 'css', path: 'lib/swiper.min.js'},
+            'swipercss': {type: 'css', path: 'lib/swiper.min.css'},
         }
     }
 

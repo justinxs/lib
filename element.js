@@ -32,9 +32,9 @@ export function getQueryString(name, mode = 'history') {
  * @returns {Object} clear 解绑事件
  */
 export function proxyAtag(parent, cb) {
-    parent = parent instanceof HTMLElement ? parent : document.querySelector(parent)
+    parent = isDom(parent) ? parent : document.querySelector(parent)
 
-    if (!parent) return
+    if (!isDom(parent)) return console.error('[proxyAtag] parent is not a HTMLElement')
     const getAtag = (target) => {
         if (target.nodeName === 'A') {
             return target
@@ -57,3 +57,25 @@ export function proxyAtag(parent, cb) {
 
     return {clear: () => parent.removeEventListener('click', listener)}
 }
+
+/**
+ *  iOS系统设备触摸行为
+ */
+export function iOSTouch(isPreventDouble = false) {
+    if (/(iPhone|iPad|iPod|iOS)/ig.test(navigator.userAgent)) {
+        //  iOS系统设备激活标签:active状态
+        document.body.addEventListener('touchstart', () => {});
+        // 阻止iOS双击缩放
+        if (isPreventDouble) {
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', e => {
+                let now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+    }
+}
+

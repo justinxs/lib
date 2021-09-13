@@ -6,6 +6,7 @@ class Events {
     constructor() {
         this.eventMap = {};
     }
+
     getRegister(eventName, callback) {
         let register = null;
         if (!eventName || !(callback && callback instanceof Function)) {
@@ -27,6 +28,7 @@ class Events {
         }
         return register
     }
+
     on(eventName, callback, callbackId = '') {
         let register = this.getRegister(eventName, callback);
         if (register) {
@@ -37,6 +39,7 @@ class Events {
             ]
         }
     }
+
     once(eventName, callback, callbackId = '') {
         const onceCallback = (...arg) => {
             this.off(eventName, onceCallback)
@@ -44,12 +47,14 @@ class Events {
         }
         this.on(eventName, onceCallback, callbackId)
     }
+
     off(eventName, callback) {
         let register = this.getRegister(eventName, callback);
         if (register && register.isRegist) {
             register.group.splice(register.index, 1)
         }
     }
+
     emit(eventName, data, callbackId = '') {
         let callbackGroup = this.eventMap[eventName];
         if (callbackGroup && (callbackGroup = callbackGroup.slice(0))) {
@@ -63,6 +68,7 @@ class Events {
             }
         }
     }
+    
     getCallbackId(key = '') {
         return key + Date.now() + parseInt(Math.random() * 10000)
     }
