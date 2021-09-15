@@ -7,16 +7,17 @@
     <title>canvas</title>
 </head>
 <body>
-    <input id="file" type="file" name="" id="">
+    <input id="file" type="file" name="" id="" accept="image/*">
+    
     <script type="module">
-        import { imgZip } from './canvas.js';
+        import { imgFileZip } from './canvas.js';
         document.querySelector('#file').addEventListener('change', e => {
             console.log(e.target.files[0])
             const url = URL.createObjectURL(e.target.files[0])
             const originImg = new Image()
             originImg.src = url
             document.body.appendChild(originImg)
-            imgZip(e.target.files[0], {type: 'image/png', q: 0.8}).then(data => {
+            imgFileZip(e.target.files[0], {type: 'image/png', q: 0.8}).then(data => {
                 console.log(data)
                 const img = new Image()
                 img.src = data.base64
