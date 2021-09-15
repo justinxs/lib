@@ -293,23 +293,57 @@ export function toBlob(file, mimeType) {
  * 文件转base64格式
  * @method fileAsBase64
  * @param {Object} file 文件 [object File] [object Blob]
+ * @param {String} mimeType file类型uint8array uint16array uint32array arraybuffer 需传
  * @return {Promise} 返回一个promise对象，成功得到一个对象 {code: 1, data}
  */
-export function fileAsBase64(file) {
-    return new Promise((resolve, reject) => {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function (e) {
-            resolve({
-                name: file.name,
-                type: file.type,
-                originSize: file.size,
-                base64: e.target.result
-            })
-        }
-        reader.onerror = function (e) {
-            console.error('[FileReader:error]' + e)
-            reject(e)
-        }
-    })
+export async function fileAsBase64(file, mimeType) {
+    const readFile = file => {
+        return new Promise((resolve, reject) => {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {
+                resolve({
+                    name: file.name || '',
+                    type: file.type,
+                    originSize: file.size,
+                    base64: e.target.result
+                })
+            }
+            reader.onerror = function (e) {
+                console.error('[FileReader:error]' + e)
+                reject(e)
+            }
+        })
+    }
+    let resourceType = getDataType(file);
+    let base64Data = null;
+    switch (resourceType) {
+        case 'file':
+            base64Data = await readFile(file);
+            break;
+        case 'blob':
+            base64Data = await readFile(file);
+            break;
+        case 'uint8array':
+        case 'uint16array':
+        case 'uint32array':
+        case 'arraybuffer':
+            base64Data = await readFile(new Blob([file], {type: mimeType}));
+            break;
+        case 'string':
+            if (testBase64(file)) {
+                base64Data = formatBase64(file)
+                base64Data = {
+                    name: '',
+                    type: base64Data.mimeType,
+                    originSize: base64Data.size,
+                    base64: file
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    
+    return base64Data
 }
