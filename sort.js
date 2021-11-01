@@ -247,11 +247,7 @@ export function bucketSort(arr) {
         return arr;
     }
 
-    if (arr.length === 0) {
-        return arr;
-    } else {
-        return sort(arr, ...minMax(arr), 0)
-    }
+    return arr.length === 0 ? arr : sort(arr, ...minMax(arr), 0)
 }
 
 

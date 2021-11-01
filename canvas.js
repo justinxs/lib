@@ -39,14 +39,14 @@ export async function imgFileZip(file, {q, type}) {
 /**
  * 以图片元素为源 压缩图片
  * @method  imgDomZip
- * @param {HTMLElement} img 图片
+ * @param {String} url 图片
  * @param {String} type 输出图片格式
  * @param {Number} q 在指定图片格式为 image/jpeg 或 image/webp的情况下，可以从 0 到 1 的区间内选择图片的质量。如果超出取值范围，将会使用默认值 0.92。其他参数会被忽略
  * @return base64
  */
-export async function imgDomZip(img, {q, type}) {
+export async function imgZip(url, {q, type}) {
     const types = ['image/jpeg', 'image/webp'];
-    const canvas = await imgAsCanvas(img.src)
+    const canvas = await imgAsCanvas(url)
 
     return canvas.toDataURL((~types.indexOf(type) && type) || types[0], q || 0.92)
 }
