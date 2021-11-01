@@ -135,7 +135,7 @@ export function floatOperate(action, ...data) {
         }
     }
 
-    return data.length > 1 ? data.reduce((re, num) => handler(action, re, num)) : data[0]
+    return data.length > 1 ? data.reduce((re, num) => handler(action, parseFloat(re) || 0, parseFloat(num) || 0)) : data[0]
 };
 
 
