@@ -343,3 +343,58 @@ export function stringify(data) {
     return result
 }
 
+
+function templateSperator(str) {
+    let sperators = ['{{|}}', '\\[|\\]', '{|}']
+    for (let i = 0; i < sperators.length; i++) {
+        const s = sperators[i];
+        if (new RegExp(s.replace('|', '.+?')).test(str)) {
+            return s
+        }
+    }
+
+    return sperators[0]
+}
+
+/**
+ * 格式化模板
+ * @param {string} template 模板字符串
+ * @param {string} s 指定插值符，如：'{{|}}', '\\[|\\]', '{|}'
+ * 
+ * 注：不指定插值符会自动查询模板字符串找到符合的插值符，默认{{|}}
+ */
+export function formatTemplate(template, s) {
+    let sperator = s || templateSperator(template)
+    let sReg = new RegExp(`(${sperator.replace('|', '.+?')})`)
+    let mReg = new RegExp(sperator.replace('|', '(.+?)'))
+    let arr = (template || '')
+        .split(sReg)
+        .map(text => {
+            let type = '', prop = '', matches = mReg.exec(text), keys;
+            if (matches) {
+                keys = matches[1].replace(/\s+/g, '').split('|')
+                type = keys[1] ? keys[1] : 'text'
+                prop = keys[0] ? keys[0] : keys[0]
+            }
+            return { type, prop, text }
+        })
+
+    return arr
+}
+
+/**
+ * 填充模板
+ * @param {string} template 模板字符串
+ * @param {Object} data 插值数据对象
+ * @param {string} s 指定插值符，如：'{{|}}', '\\[|\\]', '{|}'
+ * 
+ * 注：不指定插值符会自动查询模板字符串找到符合的插值符，默认{{|}}
+ */
+export function fillTemplate(template, data, s) {
+    let sperator = s || templateSperator(template)
+    let rReg = new RegExp(sperator.replace('|', '(.+?)'), 'g')
+    return (template || '').replace(rReg, (match, p) => {
+        let keys = p.replace(/\s+/g, '').split('|'), prop = keys[0]
+        return data[prop] || data[prop] === 0 ? data[prop] : ''
+    })
+}
