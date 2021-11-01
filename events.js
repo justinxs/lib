@@ -23,7 +23,7 @@ class Events {
                     }
                 }
 
-                register = {group, index, isRegist: index !== undefined}
+                register = { group, index, isRegist: index !== undefined }
             }
         }
         return register
@@ -32,10 +32,10 @@ class Events {
     on(eventName, callback, callbackId = '') {
         let register = this.getRegister(eventName, callback);
         if (register) {
-            !register.isRegist && register.group.push({callbackId, callback})
+            !register.isRegist && register.group.push({ callbackId, callback })
         } else {
             this.eventMap[eventName] = [
-                {callbackId, callback}
+                { callbackId, callback }
             ]
         }
     }

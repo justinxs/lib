@@ -23,41 +23,6 @@ export function getQueryString(name, mode = 'history') {
 	return null;
 }
 
-
-/**
- * 代理a标签点击默认事件
- * @param {HTMLElement|String} parent 被代理a标签的父元素
- * @param {Function} cb 代理事件回调
- * 
- * @returns {Object} clear 解绑事件
- */
-export function proxyAtag(parent, cb) {
-    parent = isDom(parent) ? parent : document.querySelector(parent)
-
-    if (!isDom(parent)) return console.error('[proxyAtag] parent is not a HTMLElement')
-    const getAtag = (target) => {
-        if (target.nodeName === 'A') {
-            return target
-        }
-        if (target === parent) {
-            return null
-        }
-
-        return getAtag(target.parentNode)
-    }
-    const listener = e => {
-        let target = e.target
-        if (target = getAtag(target)) {
-            e.preventDefault();
-            cb && cb({href: target.getAttribute('href'), target: target.getAttribute('target')}, e)
-        }
-    }
-    
-    parent.addEventListener('click', listener)
-
-    return {clear: () => parent.removeEventListener('click', listener)}
-}
-
 /**
  *  iOS系统设备触摸行为
  */

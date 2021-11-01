@@ -10,7 +10,7 @@ import { fileAsBase64, formatBase64 } from './base64.js'
  * 
  * 注：由于压缩只能image/jpeg 或 image/webp格式的图片生效，如果传入的图片不是这两个格式，则强制转成image/jpeg输出
  */
-export async function imgFileZip(file, {q, type}) {
+export async function imgFileZip(file, { q, type }) {
     const types = ['image/jpeg', 'image/webp'];
     const base64Data = await fileAsBase64(file, type)
     let result = null
@@ -44,7 +44,7 @@ export async function imgFileZip(file, {q, type}) {
  * @param {Number} q 在指定图片格式为 image/jpeg 或 image/webp的情况下，可以从 0 到 1 的区间内选择图片的质量。如果超出取值范围，将会使用默认值 0.92。其他参数会被忽略
  * @return base64
  */
-export async function imgZip(url, {q, type}) {
+export async function imgZip(url, { q, type }) {
     const types = ['image/jpeg', 'image/webp'];
     const canvas = await imgAsCanvas(url)
 

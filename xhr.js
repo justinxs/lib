@@ -81,7 +81,7 @@ export function getStaticFile(url, type = '') {
  * @param {String} fileName 文件名称(加上后缀)
  * @param {Boolean} isRemote 是否远程文件
  */ 
-export async function downloadFile({file, mimeType, fileName, isRemote}) {
+export async function downloadFile({ file, mimeType, fileName, isRemote }) {
     let blobData = null;
     if (!isRemote) {
         blobData = toBlob(file, mimeType);

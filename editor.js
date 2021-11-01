@@ -49,7 +49,7 @@ export function compositeInput(target, callback) {
 export class MemoriesEditor extends Events {
     constructor(params) {
         super()
-        let {editor, isPreventEnter = false} = params
+        let { editor, isPreventEnter = false } = params
         this.editor = editor
         this.isPreventEnter = isPreventEnter
         this.init()
@@ -88,7 +88,7 @@ export class MemoriesEditor extends Events {
         this.lastEditRange = selection.getRangeAt(0);
     }
     contentChange(action = 'input') {
-        this.emit('contentChange', {content: this.content, action})
+        this.emit('contentChange', { content: this.content, action })
     }
     setContent(content) {
         if (this.category === 'textarea') {
@@ -140,12 +140,12 @@ export class MemoriesEditor extends Events {
     getSelection(range) {
         let selection = window.getSelection();
         if (range) {
-            this.setSelectionRange(selection, {range})
+            this.setSelectionRange(selection, { range })
         }
         return selection
     }
     setSelectionRange(selection, rangeParams) {
-        let {range, rangeNode, rangeStart} = rangeParams
+        let { range, rangeNode, rangeStart } = rangeParams
         if (!range) {
             range = document.createRange()
             range.selectNodeContents(rangeNode)
@@ -237,7 +237,7 @@ export class MemoriesEditor extends Events {
             rangeStart = 0
         }
 
-        this.lastEditRange = this.setSelectionRange(selection, {rangeNode, rangeStart});
+        this.lastEditRange = this.setSelectionRange(selection, { rangeNode, rangeStart });
     }
     setRangeEnd() {
         const editor = this.editor

@@ -5,8 +5,8 @@ class LazyModule extends Events {
     constructor() {
         super()
         this.sourceMap = {
-            'QRCode': {type: 'js', path: 'lib/qrcode.min.js'},
-            'swipercss': {type: 'css', path: 'lib/swiper.min.css'},
+            'QRCode': { type: 'js', path: 'lib/qrcode.min.js' },
+            'swipercss': { type: 'css', path: 'lib/swiper.min.css' },
         }
     }
 
@@ -32,7 +32,7 @@ class LazyModule extends Events {
             const item = args[i],
             isStr = typeof item === 'string',
             namespace = isStr ? item : item.namespace,
-            query = Object.assign({v: this.version}, isStr ? null : item.query),
+            query = Object.assign({ v: this.version }, isStr ? null : item.query),
             sItem = this.sourceMap[namespace];
 
             if (sItem) {
@@ -51,10 +51,10 @@ class LazyModule extends Events {
                     }))
 
                     this.onceEvent(target, 'load', e => {
-                        this.emit(namespace, {data: window[namespace]})
+                        this.emit(namespace, { data: window[namespace] })
                     })
-                    this.onceEvent(target, 'error', e => {
-                        this.emit(namespace, {error: e})
+                    this.onceEvent(target, 'error', error => {
+                        this.emit(namespace, { error })
                     })
                     if (tabName === 'link') {
                         target.rel = "stylesheet"

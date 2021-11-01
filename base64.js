@@ -202,7 +202,7 @@ export function formatBase64(dataURI, blockSize) {
         console.error('dataURI is not define or dataURI is not DataURI')
         return
     }
-    let {noPaddingContent, size} = getBase64Size(matches[2], blockSize)
+    let { noPaddingContent, size } = getBase64Size(matches[2], blockSize)
     return {
         mimeType: matches[1] || 'text/plain;charset=UTF-8',
         content: matches[2],
@@ -276,7 +276,7 @@ export function toBlob(file, mimeType) {
         case 'uint16array':
         case 'uint32array':
         case 'arraybuffer':
-            blobData = new Blob([file], {type: mimeType});
+            blobData = new Blob([file], { type: mimeType });
             break;
         case 'string':
             blobData = base64Reg.test(file) ? base64AsBlob(file) : null;
@@ -328,7 +328,7 @@ export async function fileAsBase64(file, mimeType) {
         case 'uint16array':
         case 'uint32array':
         case 'arraybuffer':
-            base64Data = await readFile(new Blob([file], {type: mimeType}));
+            base64Data = await readFile(new Blob([file], { type: mimeType }));
             break;
         case 'string':
             if (testBase64(file)) {
