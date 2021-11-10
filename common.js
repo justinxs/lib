@@ -137,7 +137,7 @@ class FloatOperate {
     }
     operate(action, ...data) {
         if (!this.actions.includes(action) || !data) return;
-        return data.length > 1 ? data.reduce((re, num) => this.handler(action, parseFloat(re) || 0, parseFloat(num) || 0)) : data[0]
+        return data.length > 1 ? data.reduce((re, num) => this.handler(action, Number(re), Number(num))) : data[0]
     }
     exportOperator() {
         return this.operate.bind(this)
