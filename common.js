@@ -101,43 +101,50 @@ export function getPlusMinusFloat(val, radixPoint) {
  * 浮点数运算
  * @param {String} action add => 相加 subtract => 相减  multiply => 相乘 divide => 相除
  */
-export function floatOperate(action, ...data) {
-    if (!['add', '+', 'subtract', '-', 'multiply', '*', 'divide', '/'].includes(action) || !data) return;
-
-    const getFloat = num => String(num).split('.')[1] || '';
-    const getPow = (exponent, base = 10) => Math.pow(base, exponent);
-    const toInt = (val, len) => {
-        let fLen = getFloat(val).length
-        let sub = len && len > fLen ? Array.from({length: len - fLen}, (v, i) => '0').join('') : ''
+class FloatOperate {
+    constructor() {
+        this.actions = ['add', '+', 'subtract', '-', 'multiply', '*', 'divide', '/']
+    }
+    getFloat(num) {
+        return String(num).split('.')[1] || ''
+    }
+    getPow(exponent, base = 10) {
+        return Math.pow(base, exponent)
+    }
+    toInt(val, len) {
+        let fLen = this.getFloat(val).length
+        let sub = len && len > fLen ? Array.from({ length: len - fLen }, (v, i) => '0').join('') : ''
         return parseInt(String(val).replace(/\./, '') + sub)
     }
-    const handler = (action, a, b) => {
-        const aFloat = getFloat(a);
-        const bFloat = getFloat(b);
-        let aFloatLen = aFloat.length, bFloatLen = bFloat.length, maxFloatLen = Math.max(aFloatLen, bFloatLen);
+    handler(action, a, b) {
+        let aFloatLen = this.getFloat(a).length, bFloatLen = this.getFloat(b).length, maxFloatLen = Math.max(aFloatLen, bFloatLen);
         switch (action) {
             case '+':
             case 'add':
+                return (this.toInt(a, maxFloatLen) + this.toInt(b, maxFloatLen)) / this.getPow(maxFloatLen)
             case '-':
             case 'subtract':
-                return action === 'add' || action === '+' 
-                    ? (toInt(a, maxFloatLen) + toInt(b, maxFloatLen)) / getPow(maxFloatLen) 
-                    : (toInt(a, maxFloatLen) - toInt(b, maxFloatLen)) / getPow(maxFloatLen) 
+                return (this.toInt(a, maxFloatLen) - this.toInt(b, maxFloatLen)) / this.getPow(maxFloatLen)
             case '*':
             case 'multiply':
+                return this.toInt(a, aFloatLen) * this.toInt(b, bFloatLen) / this.getPow(aFloatLen + bFloatLen)
             case '/':
             case 'divide':
-                return  action === 'multiply' || action === '*'
-                    ? toInt(a, aFloatLen) * toInt(b, bFloatLen) / getPow(aFloatLen + bFloatLen) 
-                    : toInt(a, maxFloatLen) / toInt(b, maxFloatLen)
+                return this.toInt(a, maxFloatLen) / this.toInt(b, maxFloatLen)
             default:
                 break;
         }
     }
+    operate(action, ...data) {
+        if (!this.actions.includes(action) || !data) return;
+        return data.length > 1 ? data.reduce((re, num) => this.handler(action, parseFloat(re) || 0, parseFloat(num) || 0)) : data[0]
+    }
+    exportOperator() {
+        return this.operate.bind(this)
+    }
+}
 
-    return data.length > 1 ? data.reduce((re, num) => handler(action, parseFloat(re) || 0, parseFloat(num) || 0)) : data[0]
-};
-
+export const floatOperate = new FloatOperate().exportOperator()
 
 
 /**
@@ -273,61 +280,6 @@ export function shuffle(arr) {
     return arr
 }
 
-
-function templateSperator(str) {
-    let sperators = ['{{|}}', '\\[|\\]', '{|}']
-    for (let i = 0; i < sperators.length; i++) {
-        const s = sperators[i];
-        if (new RegExp(s.replace('|', '.+?')).test(str)) {
-            return s
-        }
-    }
-
-    return sperators[0]
-}
-
-/**
- * 格式化模板
- * @param {string} template 模板字符串
- * @param {string} s 指定插值符，如：'{{|}}', '\\[|\\]', '{|}'
- * 
- * 注：不指定插值符会自动查询模板字符串找到符合的插值符，默认{{|}}
- */
-export function formatTemplate(template, s) {
-    let sperator = s || templateSperator(template)
-    let sReg = new RegExp(`(${sperator.replace('|', '.+?')})`)
-    let mReg = new RegExp(sperator.replace('|', '(.+?)'))
-    let arr = (template || '')
-        .split(sReg)
-        .map(text => {
-            let type = '', prop = '', matches = mReg.exec(text), keys;
-            if (matches) {
-                keys = matches[1].replace(/\s+/g, '').split('|')
-                type = keys[1] ? keys[1] : 'text'
-                prop = keys[0] ? keys[0] : keys[0]
-            }
-            return {type, prop, text}
-        })
-
-    return arr
-}
-
-/**
- * 填充模板
- * @param {string} template 模板字符串
- * @param {Object} data 插值数据对象
- * @param {string} s 指定插值符，如：'{{|}}', '\\[|\\]', '{|}'
- * 
- * 注：不指定插值符会自动查询模板字符串找到符合的插值符，默认{{|}}
- */
-export function fillTemplate(template, data, s) {
-    let sperator = s || templateSperator(template)
-    let rReg = new RegExp(sperator.replace('|', '(.+?)'), 'g')
-    return (template || '').replace(rReg, (match, p) => {
-        let keys = p.replace(/\s+/g, '').split('|'), prop = keys[0]
-        return data[prop] || data[prop] === 0 ? data[prop] : ''
-    })
-}
 
 // application/x-www-form-urlencoded 参数格式化
 export function stringify(data) {
