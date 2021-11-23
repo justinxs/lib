@@ -227,7 +227,7 @@ export function bucketSort(arr) {
     const sort = (arr, min, max, bucketSize) => {
         //桶的初始化
         let bucketSize = bucketSize || 5; //设置桶的默认数量为5
-        let bucketCount = Math.floor((max - min) / bucketSize) + 1;   
+        let bucketCount = Math.floor((max - min) / bucketSize) + 1;
         let buckets = new Array(bucketCount);
         for (i = 0; i < buckets.length; i++) {
             buckets[i] = [];
@@ -240,7 +240,7 @@ export function bucketSort(arr) {
         for (i = 0; i < buckets.length; i++) {
             insertionSort(buckets[i]);                      //对每个桶进行排序，这里使用了插入排序
             for (var j = 0; j < buckets[i].length; j++) {
-                arr.push(buckets[i][j]);                      
+                arr.push(buckets[i][j]);
             }
         }
     
