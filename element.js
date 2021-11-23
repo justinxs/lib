@@ -52,14 +52,14 @@ export function iOSTouch(isPreventDouble = false) {
  * @returns {Object} clear 解绑事件
  */
 export function proxyAtag(parent, cb) {
-    parent = parent instanceof HTMLElement ? parent : document.querySelector(parent)
+    parent = isDom(parent) ? parent : document.querySelector(parent)
 
     if (!parent) return console.error(`parent is undefined!`)
     const getAtag = (target) => {
         if (target.nodeName === 'A') {
             return target
         }
-        if (target === parent) {
+        if (target === parent || !target) {
             return null
         }
 

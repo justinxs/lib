@@ -139,12 +139,12 @@ class FloatOperate {
         if (!this.actions.includes(action) || !data) return;
         return data.length > 1 ? data.reduce((re, num) => this.handler(action, Number(re), Number(num))) : data[0]
     }
-    exportOperator() {
-        return this.operate.bind(this)
+    exportAction(action) {
+        return this[action] && this[action].bind(this)
     }
 }
 
-export const floatOperate = new FloatOperate().exportOperator()
+export const floatOperate = new FloatOperate().exportAction('operate')
 
 
 /**
