@@ -1,11 +1,12 @@
 const fs = require('fs')
 const { exec } = require('child_process')
+const TARGET_DIR = ''
 /**
  * 对比差异的两个提交版本，git log 查看commit hash
  * 例如 1.0.0 <OLD_COMMIT> 更新到 1.0.1 <NEW_COMMIT>
  */
-const NEW_COMMIT = '79df36689f8de19a2346a7416ce920170f783af3'
-const OLD_COMMIT = 'ebfd42e641b9f76d5d028809b2155bd861afa4df'
+const NEW_COMMIT = '4386a9766d82073c5e49e227bb813c1148981bec'
+const OLD_COMMIT = '4a0bee2c79044a20167b482ffb2759630e51f6b1'
 
 // A: 你本地新增的文件 <ADD>
 // C: 文件的一个新拷贝 <COPY>
@@ -16,20 +17,25 @@ const OLD_COMMIT = 'ebfd42e641b9f76d5d028809b2155bd861afa4df'
 // U: 文件没有被合并 <UNCATCH>
 // X: 未知状态
 
+
+
+const getPathIndex = status => {
+    let statusMap = {
+        R: 2
+    }
+
+    return statusMap[status] || 1
+}
+
 const statusLineHandle = lineText => {
     let statusIndex = 0
-    let getPathIndex = status => {
-        let statusMap = {
-            R: 2
-        }
-        return statusMap[status] || 1
-    }
     let sides = lineText.split(/\t/)
     let originalStatus = sides[statusIndex] || ''
     let status = originalStatus[0] || ''
     let originalPath = (sides[1] || '').replace(/dist\//, '')
     let fullPath = (sides[getPathIndex(status)] || '').replace(/dist\//, '')
     let paths = fullPath.split('/')
+    
     return {
         status,
         originalStatus,
@@ -59,7 +65,7 @@ const exportDir = arr => {
         arr
         .filter(item => exportStatus.includes(item.status))
         .forEach(item => {
-            fs.readFile('dist/' + item.fullPath, (err, data) => {
+            fs.readFile((TARGET_DIR ? TARGET_DIR + '/' : '') + item.fullPath, (err, data) => {
                 if (err) return console.error(`readFile ${item.fullPath} error: `, err)
                 const writeFile = () => {
                     fs.writeFile(`${parentDir}/` + item.fullPath, data, (error) => {
@@ -81,7 +87,7 @@ const exportDir = arr => {
     });
 }
 
-exec(`git diff --name-status ${OLD_COMMIT} ${NEW_COMMIT}`, (error, stdout, stderr) => {
+exec(`git diff --name-status ${OLD_COMMIT} ${NEW_COMMIT} ${TARGET_DIR}`, (error, stdout, stderr) => {
     if (error) {
         console.error(`exec error: ${error}`);
         return;
