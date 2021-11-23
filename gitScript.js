@@ -48,59 +48,84 @@ const statusLineHandle = lineText => {
 
 
 const exportJSON = jsonStr => {
-    fs.writeFile(`update_${NEW_COMMIT}.json`, jsonStr, (error) => {
-        if (error) {
-            console.error('导出JSON失败', error)
-        } else {
-            console.log('导出 update.json')
+    fs.writeFile(
+        `update_${NEW_COMMIT}.json`, 
+        jsonStr, 
+        (error) => {
+            if (error) {
+                console.error('导出JSON失败', error)
+            } else {
+                console.log('导出 update.json')
+            }
         }
-    })
+    )
 }
 
 
 const exportDir = arr => {
     const exportStatus = ['A', 'M', 'R'], parentDir = 'update_' + NEW_COMMIT
-    fs.mkdir(parentDir, { recursive: true }, (err) => {
-        if (err) return console.error('mkdir update error: ' + err);
-        arr
-        .filter(item => exportStatus.includes(item.status))
-        .forEach(item => {
-            fs.readFile((TARGET_DIR ? TARGET_DIR + '/' : '') + item.fullPath, (err, data) => {
-                if (err) return console.error(`readFile ${item.fullPath} error: `, err)
-                const writeFile = () => {
-                    fs.writeFile(`${parentDir}/` + item.fullPath, data, (error) => {
-                        if (error) {
-                            console.error(`writeFile ${parentDir}/${item.fullPath} error: `, error)
+    fs.mkdir(
+        parentDir, 
+        { recursive: true }, 
+        (err) => {
+            if (err) return console.error('mkdir update error: ' + err);
+
+            arr.forEach(item => {
+                if (!exportStatus.includes(item.status)) return console.log('ignore status ' + item.originalStatus);
+
+                fs.readFile(
+                    (TARGET_DIR ? TARGET_DIR + '/' : '') + item.fullPath, 
+                    (err, data) => {
+                        if (err) return console.error(`readFile ${item.fullPath} error: `, err)
+
+                        const writeFile = () => {
+                            fs.writeFile(
+                                `${parentDir}/` + item.fullPath, 
+                                data, 
+                                (error) => {
+                                    if (error) {
+                                        console.error(`writeFile ${parentDir}/${item.fullPath} error: `, error)
+                                    }
+                                }
+                            )
                         }
-                    })
-                }
-                if (!item.path || item.path === '/') {
-                    writeFile()
-                } else {
-                    fs.mkdir(`${parentDir}/` + item.path, { recursive: true }, (err) => {
-                        if (err) return console.error(`mkdir ${parentDir}/${item.path} error: `, err)
-                        writeFile()
-                    })
-                }
-            });
-        })
-    });
+                        if (!item.path || item.path === '/') {
+                            writeFile()
+                        } else {
+                            fs.mkdir(
+                                `${parentDir}/` + item.path, 
+                                { recursive: true }, 
+                                (err) => {
+                                    if (err) return console.error(`mkdir ${parentDir}/${item.path} error: `, err)
+
+                                    writeFile()
+                                }
+                            )
+                        }
+                    }
+                );
+            })
+        }
+    );
 }
 
-exec(`git diff --name-status ${OLD_COMMIT} ${NEW_COMMIT} ${TARGET_DIR}`, (error, stdout, stderr) => {
-    if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-    }
-    if (stderr) {
-        console.error(`stderr: ${stderr}`);
-    }
+exec(
+    `git diff --name-status ${OLD_COMMIT} ${NEW_COMMIT} ${TARGET_DIR}`, 
+    (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+        }
 
-    let jsonArr = stdout.split(/\n/)
-        .map(t => statusLineHandle(t))
-        .filter(item => item.status && item.name)
-    // 导出 diff json
-    exportJSON(JSON.stringify(jsonArr))
-    // 导出update文件夹
-    exportDir(jsonArr)
-})
+        let jsonArr = stdout.split(/\n/)
+            .map(t => statusLineHandle(t))
+            .filter(item => item.status && item.name)
+        // 导出 diff json
+        exportJSON(JSON.stringify(jsonArr))
+        // 导出update文件夹
+        exportDir(jsonArr)
+    }
+)
