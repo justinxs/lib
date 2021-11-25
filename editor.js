@@ -31,12 +31,12 @@ export function compositeInput(target, callback) {
     }, false);
     
     return {
-        target,
         clear() {
             target.removeEventListener('compositionstart', cp_start_cb, false);
             target.removeEventListener('compositionend', cp_end_cb, false);
             target.removeEventListener('input', input_cb, false);
             target.removeEventListener('blur', blur_cb, false);
+            target = null
         }
     }
 }
