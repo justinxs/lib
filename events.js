@@ -17,7 +17,7 @@ class Events {
             if (group) {
                 for (let i = 0; i < group.length; i++) {
                     const item = group[i]
-                    if (item.callback === callback) {
+                    if (item.callback === callback || item.callback.listener === callback) {
                         index = i
                         break
                     }
@@ -45,6 +45,7 @@ class Events {
             this.off(eventName, onceCallback)
             callback(...arg)
         }
+        onceCallback.listener = callback
         this.on(eventName, onceCallback, callbackId)
     }
 
@@ -52,6 +53,9 @@ class Events {
         let register = this.getRegister(eventName, callback);
         if (register && register.isRegist) {
             register.group.splice(register.index, 1)
+            if (register.group.length == 0) {
+                delete this.eventMap[eventName]
+            }
         }
     }
 
