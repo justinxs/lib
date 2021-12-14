@@ -73,8 +73,10 @@ class Events {
         }
     }
     
-    getCallbackId(key = '') {
-        return key + Date.now() + parseInt(Math.random() * 10000)
+    getCallbackId() {
+        const id = URL.createObjectURL(new Blob());
+        URL.revokeObjectURL(id);
+        return id.substr(-36);
     }
 }
 
