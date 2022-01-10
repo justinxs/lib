@@ -350,3 +350,68 @@ export function fillTemplate(template, data, s) {
         return data[prop] || data[prop] === 0 ? data[prop] : ''
     })
 }
+
+/**
+ * Escapes special characters and HTML entities in a given html string.
+ *
+ * @param  {string} string HTML string to escape for later insertion
+ * @return {string}
+ * @public
+ */
+
+export function escapeHtml(string) {
+    const matchHtmlRegExp = /["'&<>]/;
+    const str = '' + string;
+    const match = matchHtmlRegExp.exec(str);
+
+    if (!match) {
+        return str;
+    }
+
+    let escape;
+    let html = '';
+    let index;
+    let lastIndex = 0;
+
+    for (index = match.index; index < str.length; index++) {
+        switch (str.charCodeAt(index)) {
+        case 34:
+            // "
+            escape = '&quot;';
+            break;
+
+        case 38:
+            // &
+            escape = '&amp;';
+            break;
+
+        case 39:
+            // '
+            escape = '&#x27;'; // modified from escape-html; used to be '&#39'
+
+            break;
+
+        case 60:
+            // <
+            escape = '&lt;';
+            break;
+
+        case 62:
+            // >
+            escape = '&gt;';
+            break;
+
+        default:
+            continue;
+        }
+
+        if (lastIndex !== index) {
+            html += str.substring(lastIndex, index);
+        }
+
+        lastIndex = index + 1;
+        html += escape;
+    }
+
+    return lastIndex !== index ? html + str.substring(lastIndex, index) : html;
+} 
